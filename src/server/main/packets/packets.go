@@ -48,13 +48,13 @@ func newFormValues() url.Values {
 	values.Add("array1", "value1")
 	values.Add("array1", "value2")
 	values.Add("name", "sample name")
-	values.Add("id", "55077361dc3a6f4c09000001")
+	values.Add("id", "550870fcdc3a6f60b3000002")
 	return values
 }
 
 func NewRequestPacket() *RequestPacket {
 	urlPath := url.URL{
-		Path: "/",
+		Path: "/generic",
 	}
 	request := http.Request{
 		Method: "GET",

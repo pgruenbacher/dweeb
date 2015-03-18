@@ -1,39 +1,46 @@
 package routers
 
 import (
+	"github.com/pgruenbacher/dweeb/src/server/main/log"
 	"github.com/pgruenbacher/dweeb/src/server/main/packets"
 	"github.com/pgruenbacher/goflow"
-	"testing"
+	"net/http"
+	"strings"
 )
 
-func TestFirst(t *testing.T) {
+// Simple table-based request router
+type Splitter struct {
+	flow.Component
+	In   chan *packets.RequestPacket
+	Get  chan<- *packets.RequestPacket
+	Post chan<- *packets.RequestPacket
 
-	postPacket := packets.NewRequestPacket()
-	postPacket.Req.URL.Path = "/generic"
-	postPacket.Req.Method = "POST"
-	getPacket := packets.NewRequestPacket()
-	getPacket.Req.URL.Path = "/generic"
+	// State
+	BasePath string
+}
 
-	d := new(Router)
-	postGeneric := make(chan *packets.RequestPacket, 10)
-	getGeneric := make(chan *packets.RequestPacket, 10)
-	in := make(chan *packets.RequestPacket, 10)
-	d.In = in
-	d.GetGeneric = getGeneric
-	d.PostGeneric = postGeneric
-	flow.RunProc(d)
+// Request handler
+func (r *Splitter) OnIn(p *packets.RequestPacket) {
 
-	for i := 0; i < 10; i++ {
-		in <- postPacket
-		in <- getPacket
-		for i := 0; i < 1; i++ {
-			i2 := <-getGeneric
-			i3 := <-postGeneric
-			if i2.Req.Method != "GET" || i3.Req.Method != "POST" {
-				t.Error("failed router")
-			}
-		}
+	log.Info("%v %s", p.Req.Method, p.Req.URL.Path)
+
+	path := p.Req.URL.Path
+
+	if strings.Index(path, r.BasePath) == 0 {
+		path = path[len(r.BasePath):]
 	}
 
-	close(in)
+	var fwd chan<- *packets.RequestPacket
+	ok := true
+
+	if p.Req.Method == "POST" {
+		fwd = r.Post
+	} else if p.Req.Method == "GET" {
+		fwd = r.Get
+	}
+	if !ok {
+		p.Error(http.StatusBadRequest, "Unknown path: "+path)
+	} else {
+		fwd <- p
+	}
 }

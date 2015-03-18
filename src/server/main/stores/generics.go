@@ -2,6 +2,7 @@ package stores
 
 import (
 	"github.com/pgruenbacher/dweeb/src/server/main/database"
+	"github.com/pgruenbacher/dweeb/src/server/main/log"
 	"github.com/pgruenbacher/dweeb/src/server/main/packets"
 	"github.com/pgruenbacher/goflow"
 	"net/http"
@@ -62,6 +63,10 @@ func (r *Storage) OnGetClose() {
 }
 
 func (r *Storage) OnPostClose() {
+}
+
+func (r *Storage) Finish() {
+	log.Info("generic store closed")
 }
 
 // func (r *Storage) Finish() {

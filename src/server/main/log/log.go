@@ -6,6 +6,8 @@ package log
 import (
 	"fmt"
 	"log"
+	"runtime"
+	"strings"
 )
 
 const blue = "\x1B[0;34m"
@@ -15,6 +17,7 @@ const yellow = "\x1B[0;33m"
 const white = ""
 const reset = "\x1B[0m"
 const teal = "\x1B[0;36m"
+const gray = "\x1B[0;35m"
 
 type LogLevel struct {
 	color  string
@@ -24,13 +27,21 @@ type LogLevel struct {
 	method func(string, ...interface{})
 }
 
+func init() {
+	// only prints the log.go file lines...need to fix
+	// log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetFlags(0)
+}
+
 func (level LogLevel) prefix() string {
 	return fmt.Sprintf("%v[%v%v%v] ", level.suffix, level.color, level.name, reset)
 }
 
 func (level LogLevel) log(format string, v ...interface{}) {
+	fname, fline := trace()
+	p := fmt.Sprintf("%v%10s:%d%v ", gray, fname, fline, reset)
 	if level.level >= MinLevel.level {
-		level.method(level.prefix()+format, v...)
+		level.method(level.prefix()+p+format, v...)
 	}
 }
 
@@ -84,4 +95,19 @@ func Panic(format string, v ...interface{}) {
 // followed by a call to os.Exit
 func Fatal(format string, v ...interface{}) {
 	FatalLevel.log(format, v...)
+}
+
+// FuncForPC returns a *Func describing the function that contains the given program counter address, or else nil.
+// FileLine returns the file name and line number of the source code corresponding to the program counter pc. The result will not be accurate if pc is not a program counter within f.
+func trace() (string, int) {
+	pc := make([]uintptr, 3) // at least 1 entry needed.
+	runtime.Callers(3, pc)
+	f := runtime.FuncForPC(pc[1])
+	file, line := f.FileLine(pc[1])
+
+	nameString := file
+	nameArray := strings.Split(nameString, "/")
+	name := nameArray[len(nameArray)-1]
+
+	return name, line
 }

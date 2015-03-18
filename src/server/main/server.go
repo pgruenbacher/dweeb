@@ -22,12 +22,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Create application net
-	routerIn = make(chan *packets.RequestPacket)
-	a := NewApp()
-	a.SetInPort("AppInput", routerIn)
+	// routerIn = make(chan *packets.RequestPacket)
+	// a := NewApp()
+	// a.SetInPort("AppInput", routerIn)
+	init := make(chan bool)
 	// Run
+	a := NewApp()
+	a.SetInPort("AppInput", init)
 	flow.RunNet(a)
+	init <- true
+
 	// Serve
-	http.HandleFunc("/", handler)
-	http.ListenAndServe("localhost:9090", nil)
+	// http.HandleFunc("/", handler)
+	// http.ListenAndServe("localhost:9090", nil)
 }

@@ -31,4 +31,5 @@ func (r *Responder) OnIn(p *packets.RequestPacket) {
 }
 
 func (r *Responder) OnInClose() {
+	log.Info("Responder closed")
 }
