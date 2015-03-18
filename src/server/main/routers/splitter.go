@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"github.com/pgruenbacher/dweeb/src/server/main/log"
 	"github.com/pgruenbacher/dweeb/src/server/main/packets"
 	"github.com/pgruenbacher/goflow"
 	"net/http"
@@ -11,7 +10,7 @@ import (
 // Simple table-based request router
 type Splitter struct {
 	flow.Component
-	In   chan *packets.RequestPacket
+	In   <-chan *packets.RequestPacket
 	Get  chan<- *packets.RequestPacket
 	Post chan<- *packets.RequestPacket
 
@@ -21,8 +20,6 @@ type Splitter struct {
 
 // Request handler
 func (r *Splitter) OnIn(p *packets.RequestPacket) {
-
-	log.Info("%v %s", p.Req.Method, p.Req.URL.Path)
 
 	path := p.Req.URL.Path
 

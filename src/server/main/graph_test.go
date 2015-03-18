@@ -12,7 +12,7 @@ func TestNetwork(t *testing.T) {
 	// packetInput.Req.Method = "POST"
 	// gPI := packets.NewRequestPacket()
 
-	in := make(chan bool)
+	in := make(chan int)
 
 	n := NewApp()
 	// Ports
@@ -24,7 +24,7 @@ func TestNetwork(t *testing.T) {
 	flow.RunNet(n)
 
 	// in <- packetInput
-	in <- true
+	in <- 1
 	// <-packetInput.Done
 	// in <- gPI
 	// <-gPI.Done

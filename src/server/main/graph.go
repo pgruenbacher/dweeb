@@ -39,7 +39,7 @@ func NewApp() *App {
 	net.Connect("postGenericController", "Out", "storage", "Post")
 	net.Connect("storage", "Out", "responder", "In")
 	// Network ports
-	net.MapInPort("AppInput", "router", "Init")
+	net.MapInPort("AppInput", "router", "Input")
 	return net
 }
 

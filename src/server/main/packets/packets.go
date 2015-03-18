@@ -21,6 +21,8 @@ func (p *RequestPacket) Error(code int, msg string) {
 	log.Error("%v:%v", code, msg)
 	p.Res.WriteHeader(code)
 	js, _ := json.Marshal(Error{Code: code, Msg: msg})
+	p.Res.Header().Set("Content-Length", len(js))
+	p.Res.Header().Set("Content-Type", "application/json")
 	p.Res.Write(js)
 	p.Done <- true
 }
