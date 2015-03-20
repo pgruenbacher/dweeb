@@ -12,13 +12,13 @@ import (
 // Simple table-based request router
 type Router struct {
 	flow.Component
-	Input    <-chan int
+	Input    <-chan bool
 	Generics chan<- *packets.RequestPacket
 
 	// State
 }
 
-func (r *Router) OnInput(i int) {
+func (r *Router) OnInput(i bool) {
 	m := pat.New()
 	m.Get("/generics/:name", http.HandlerFunc(route(r.Generics)))
 	m.Post("/generics/:name", http.HandlerFunc(route(r.Generics)))
